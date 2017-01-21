@@ -6,7 +6,7 @@ var app = express()
 // app.set('view engine', 'html')
 
 
-app.use(express.static(__dirname + '/app/public'))
+app.use(express.static(__dirname + '/public'))
 var routes = require('./app/routes/index.js')
 
 
