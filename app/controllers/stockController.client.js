@@ -68,7 +68,6 @@ angular
 
       }, function (res) {
         console.log(res)
-      }
       })
     }
 

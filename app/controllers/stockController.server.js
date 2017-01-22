@@ -7,11 +7,12 @@ module.exports = function StockController () {
   }
 
   this.addStock = function (req, res) {
+    var tickerSymbol = req.body.ticker
 
   }
 
   this.deleteStock = function (req, res) {
-    
+
   }
 
 
