@@ -7,6 +7,8 @@ var app = express()
 
 
 app.use(express.static(__dirname + '/public'))
+app.use('/controllers', express.static(process.cwd() + '/app/controllers'))
+
 var routes = require('./app/routes/index.js')
 
 
