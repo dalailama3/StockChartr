@@ -18,7 +18,7 @@ angular
    '#DB843D', '#92A8CD', '#A47D7C', '#B5CA92']
 
     $scope.updateStocks = function (stock) {
-
+        var ticker = stock.toUpperCase()
         var url = `https://www.quandl.com/api/v3/datasets/WIKI/${stock}.json?api_key=qAY7XBnmZQbJfSrr-tyK`
         $http.get(url)
         .then(function successCallback (res) {
@@ -28,12 +28,14 @@ angular
             return [new Date(arr[0]).getTime(), arr[4]]
           })
           $scope.seriesOptions.push({
-            name: stock.toUpperCase(),
+            name: ticker,
             data: data,
             color: $scope.colors[$scope.seriesCounter]
           })
           $scope.seriesCounter += 1
           $scope.stockList.push(res.data.dataset.name);
+
+          $scope.addStockToDB(ticker)
           $scope.newStock = ""
 
 
@@ -58,6 +60,17 @@ angular
       }
     }
 
+    $scope.addStockToDB = function (ticker) {
+
+      var url = 'http://localhost:8080/api/stocks'
+      $http.post(url, {ticker: ticker}).then(function (res) {
+        console.log(res)
+
+      }, function (res) {
+        console.log(res)
+      }
+      })
+    }
 
 
 
