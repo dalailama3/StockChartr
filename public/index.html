@@ -3,15 +3,25 @@
 <html ng-app="stocks">
   <head>
 
+    <script type="text/javascript" src="https://code.highcharts.com/stock/highstock.js"></script>
+
 
   </head>
-  <body>
-    <div ng-controller="stocksController" ng-init="getStock()">
+  <body ng-controller="stocksController">
+    <form ng-submit="addStock()">
+      <input type="text" placeholder="Enter stock ticker symbol" ng-model="newStock"></input> {{newStock}}
+      <input type="submit"> {{errorMsg}}
+    </form>
 
-    </div>
+    <ul>
+      <li ng-repeat="stock in stockList">
+        {{stock}}
+      </li>
+    </ul>
+    <div id="container"></div>
 
   </body>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
   <script type="text/javascript" src="/controllers/stockController.client.js"></script>
 
 
