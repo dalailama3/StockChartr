@@ -1,5 +1,6 @@
 'use strict';
 
+
 module.exports = function StockController () {
 
   this.getStocks = function (req, res) {
@@ -8,6 +9,7 @@ module.exports = function StockController () {
 
   this.addStock = function (req, res) {
     var tickerSymbol = req.body.ticker
+
 
   }
 
