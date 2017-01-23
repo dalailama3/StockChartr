@@ -5,7 +5,10 @@ var STOCKS = require('../models/stocks.js')
 module.exports = function StockController () {
 
   this.getStocks = function (req, res) {
-
+    STOCKS.find({}, function (err, results) {
+      if (err) { throw err }
+      res.json(results)
+    })
   }
 
   this.addStock = function (req, res) {
@@ -15,7 +18,7 @@ module.exports = function StockController () {
     })
 
     newStock.save(function (err, result) {
-      if (err) { throw err; }
+      if (err) { throw err;}
       res.json(result)
     })
 

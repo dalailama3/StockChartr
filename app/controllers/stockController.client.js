@@ -9,13 +9,23 @@ angular
 
     $scope.stockDatas = []
     $scope.newStock = ""
+    $scope.stockHash = {}
+    $scope.stockDBList = []
     $scope.stockList = []
     $scope.seriesOptions = []
     $scope.seriesCounter = 0
     $scope.errorMsg = ""
+    $scope.alreadyHasMsg = ""
     $scope.colors = ["#e41a1c","#377eb8","#4daf4a","#984ea3","#ff7f00","#a65628","#f781bf",'#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a','#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9',
 '#f15c80', '#e4d354', '#8085e8', '#8d4653', '#91e8e1','#4572A7', '#AA4643', '#89A54E', '#80699B', '#3D96AE',
    '#DB843D', '#92A8CD', '#A47D7C', '#B5CA92']
+
+
+   function loadStocks() {
+     $scope.stockList.forEach((stock)=> {
+       $scope.updateStocks(stock)
+     })
+   }
 
     $scope.updateStocks = function (stock) {
         var ticker = stock.toUpperCase()
@@ -24,6 +34,7 @@ angular
         .then(function successCallback (res) {
           console.log(res)
           $scope.errorMsg = ""
+          $scope.alreadyHasMsg = ""
           var data = res.data.dataset.data.reverse().map((arr)=> {
             return [new Date(arr[0]).getTime(), arr[4]]
           })
@@ -33,9 +44,13 @@ angular
             color: $scope.colors[$scope.seriesCounter]
           })
           $scope.seriesCounter += 1
-          $scope.stockList.push(res.data.dataset.name);
+          $scope.stockHash[ticker] = res.data.dataset.name;
 
-          $scope.addStockToDB(ticker)
+
+
+          if ($scope.stockList.indexOf(ticker) === -1) {
+            $scope.addStockToDB(ticker)
+          }
           $scope.newStock = ""
 
 
@@ -53,10 +68,12 @@ angular
     }
 
     $scope.addStock = function () {
-      var stock = this.newStock
+      var stock = this.newStock.toUpperCase()
 
-      if (this.stockList.indexOf(stock) === -1) {
+      if ($scope.stockList.indexOf(stock) === -1) {
         this.updateStocks(stock)
+      } else {
+        $scope.alreadyHasMsg = "Stock is already added"
       }
     }
 
@@ -70,6 +87,28 @@ angular
         console.log(res)
       })
     }
+
+
+     $scope.deleteStock = function (stock) {
+
+     }
+
+
+    $scope.getStocksFromDB = function () {
+      var url = 'http://localhost:8080/api/stocks'
+      $http.get(url).then(function (res) {
+        console.log(res.data)
+        $scope.stockDBList = res.data
+        $scope.stockList = $scope.stockDBList.map((obj)=> { return obj.ticker })
+        loadStocks()
+      }, function (res) {
+        console.log(res)
+      })
+    }
+
+    $scope.getStocksFromDB()
+
+
 
 
 

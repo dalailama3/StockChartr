@@ -10,12 +10,12 @@
   <body ng-controller="stocksController">
     <form ng-submit="addStock()">
       <input type="text" placeholder="Enter stock ticker symbol" ng-model="newStock"></input> {{newStock}}
-      <input type="submit"> {{errorMsg}}
+      <input type="submit"> {{errorMsg}} {{alreadyHasMsg}}
     </form>
 
     <ul>
-      <li ng-repeat="stock in stockList">
-        {{stock}}
+      <li ng-repeat="stock in stockList">{{stock}} {{stockHash[stock]}}
+        <button ng-click="deleteStock(stock)" class="deleteStock">DELETE</button
       </li>
     </ul>
     <div id="container"></div>
