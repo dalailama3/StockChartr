@@ -12,7 +12,7 @@ module.exports = function (app) {
     .get(stockController.getStocks)
     .post(stockController.addStock)
 
-  app.delete('/api/stocks/:stockId', stockController.deleteStock)
+  app.delete('/api/stocks/:stock', stockController.deleteStock)
 
 
 

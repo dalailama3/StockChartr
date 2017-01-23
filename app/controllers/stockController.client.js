@@ -29,7 +29,7 @@ angular
 
     $scope.updateStocks = function (stock) {
         var ticker = stock.toUpperCase()
-        var url = `https://www.quandl.com/api/v3/datasets/WIKI/${stock}.json?api_key=qAY7XBnmZQbJfSrr-tyK`
+        var url = `https://www.quandl.com/api/v3/datasets/WIKI/${ticker}.json?api_key=qAY7XBnmZQbJfSrr-tyK`
         $http.get(url)
         .then(function successCallback (res) {
           console.log(res)
@@ -50,15 +50,20 @@ angular
 
           if ($scope.stockList.indexOf(ticker) === -1) {
             $scope.addStockToDB(ticker)
+            $scope.stockList.push(ticker)
+            createChart($scope.seriesOptions)
+
           }
           $scope.newStock = ""
 
+          if ($scope.seriesCounter === $scope.stockList.length) {
+            createChart($scope.seriesOptions)
 
-          createChart($scope.seriesOptions)
+          }
 
         }, function errorCallback (res) {
           console.log(res)
-          $scope.errorMsg = res.data.quandl_error.message
+          $scope.errorMsg = "error"
           $scope.newStock = ""
 
 
@@ -90,6 +95,24 @@ angular
 
 
      $scope.deleteStock = function (stock) {
+       var url = `http://localhost:8080/api/stocks/${stock}`
+       $http.delete(url).then(function (res) {
+         $scope.seriesOptions = findAndDeleteStock($scope.seriesOptions, stock)
+         console.log($scope.stockList)
+         $scope.stockList.splice($scope.stockList.indexOf(stock),1)
+         createChart($scope.seriesOptions)
+       }, function (res) {
+         console.log(res)
+       })
+
+     }
+
+     function findAndDeleteStock(arr, stock) {
+       var result = arr.filter((obj)=> {
+         return obj.name !== stock
+       })
+
+       return result
 
      }
 
