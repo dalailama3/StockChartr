@@ -192,7 +192,10 @@ angular
 
         if (status === "socketio delete") {
           $scope.seriesOptions = findAndDeleteStock($scope.seriesOptions, stockToDelete)
-          $scope.stockList.splice($scope.stockList.indexOf(stockToDelete),1)
+
+          $scope.stockList = $scope.stockList.filter((el)=> {
+            return el !== stockToDelete
+          })
           createChart($scope.seriesOptions)
         }
       }, function (res) {
