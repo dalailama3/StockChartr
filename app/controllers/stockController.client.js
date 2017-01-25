@@ -153,7 +153,7 @@ angular
 
     $scope.addStockToDB = function (ticker) {
 
-      var url = 'http://localhost:8080/api/stocks'
+      var url = 'https://fcc-stockchartr.herokuapp.com/api/stocks'
       $http.post(url, {ticker: ticker}).then(function (res) {
         console.log(res)
 
@@ -165,7 +165,7 @@ angular
 
      $scope.deleteStock = function (stock) {
 
-         var url = `http://localhost:8080/api/stocks/${stock}`
+         var url = `https://fcc-stockchartr.herokuapp.com/api/stocks/${stock}`
          $http.delete(url).then(function (res) {
 
          }, function (res) {
@@ -184,7 +184,7 @@ angular
 
 
     $scope.getStocksFromDB = function (status, stockToDelete) {
-      var url = 'http://localhost:8080/api/stocks'
+      var url = 'https://fcc-stockchartr.herokuapp.com/api/stocks'
       $http.get(url).then(function (res) {
         $scope.stockDBList = res.data
         $scope.stockList = $scope.stockDBList.map((obj)=> { return obj.ticker })
