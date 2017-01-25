@@ -8,10 +8,14 @@ angular
     ['$scope','$http', 'socketio', function ($scope, $http, socketio) {
 
     socketio.on('newStock', function (stock) {
-      console.log("updating all clients...")
+      console.log("updating all clients... a stock has been added")
       $scope.getStocksFromDB("socketio")
-      // $scope.updateChart()
+    })
 
+    socketio.on('deleteStock', function (stock) {
+      console.log("updating all clients... a stock has been removed: ", stock)
+
+      $scope.getStocksFromDB("socketio delete", stock)
     })
 
     $scope.stockDatas = []
@@ -23,6 +27,7 @@ angular
     $scope.seriesCounter = 0
     $scope.errorMsg = ""
     $scope.alreadyHasMsg = ""
+    $scope.deletedStock = ""
     $scope.colors = ["#e41a1c","#377eb8","#4daf4a","#984ea3","#ff7f00","#a65628","#f781bf",'#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a','#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9',
 '#f15c80', '#e4d354', '#8085e8', '#8d4653', '#91e8e1','#4572A7', '#AA4643', '#89A54E', '#80699B', '#3D96AE',
    '#DB843D', '#92A8CD', '#A47D7C', '#B5CA92']
@@ -74,6 +79,7 @@ angular
            $scope.seriesOptions.push(obj)
            $scope.stockHash[ticker] = res.data.dataset.name;
            createChart($scope.seriesOptions)
+         }
 
       }, function (res) {
 
@@ -152,16 +158,13 @@ angular
 
 
      $scope.deleteStock = function (stock) {
-       var url = `http://localhost:8080/api/stocks/${stock}`
-       $http.delete(url).then(function (res) {
-         $scope.seriesOptions = findAndDeleteStock($scope.seriesOptions, stock)
-         console.log($scope.stockList)
-         $scope.stockList.splice($scope.stockList.indexOf(stock),1)
-         createChart($scope.seriesOptions)
-       }, function (res) {
-         console.log(res)
-       })
 
+         var url = `http://localhost:8080/api/stocks/${stock}`
+         $http.delete(url).then(function (res) {
+
+         }, function (res) {
+           console.log(res)
+         })
      }
 
      function findAndDeleteStock(arr, stock) {
@@ -174,7 +177,7 @@ angular
      }
 
 
-    $scope.getStocksFromDB = function (status) {
+    $scope.getStocksFromDB = function (status, stockToDelete) {
       var url = 'http://localhost:8080/api/stocks'
       $http.get(url).then(function (res) {
         $scope.stockDBList = res.data
@@ -185,6 +188,12 @@ angular
 
         if (status === "socketio") {
           $scope.updateChart($scope.stockList)
+        }
+
+        if (status === "socketio delete") {
+          $scope.seriesOptions = findAndDeleteStock($scope.seriesOptions, stockToDelete)
+          $scope.stockList.splice($scope.stockList.indexOf(stockToDelete),1)
+          createChart($scope.seriesOptions)
         }
       }, function (res) {
         console.log(res)

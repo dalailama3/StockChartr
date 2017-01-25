@@ -27,9 +27,9 @@ module.exports = function StockController (io) {
   }
 
   this.deleteStock = function (req, res) {
-    console.log(req.params.stock)
     STOCKS.remove({ticker: req.params.stock}, function (err, result) {
       if (err) { throw err}
+      io.emit('deleteStock', req.params.stock)
       res.end()
     })
   }
