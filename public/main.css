@@ -1,0 +1,17 @@
+body, html, ul, div, li {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+}
+
+.stockList {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.flexDiv {
+  height: 100px;
+  border: 1px solid black;
+}
