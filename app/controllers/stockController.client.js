@@ -5,7 +5,14 @@
 angular
   .module('stocks', [])
   .controller('stocksController',
-    ['$scope','$http', function ($scope, $http) {
+    ['$scope','$http', 'socketio', function ($scope, $http, socketio) {
+
+    socketio.on('newStock', function (stock) {
+      console.log("updating all clients...")
+      $scope.getStocksFromDB("socketio")
+      // $scope.updateChart()
+
+    })
 
     $scope.stockDatas = []
     $scope.newStock = ""
@@ -21,13 +28,62 @@ angular
    '#DB843D', '#92A8CD', '#A47D7C', '#B5CA92']
 
 
-   function loadStocks() {
-     $scope.stockList.forEach((stock)=> {
-       $scope.updateStocks(stock)
+   function loadStocks(status) {
+     if (status === 'loading') {
+       $scope.stockList.forEach((stock)=> {
+         $scope.updateStocks(stock, status)
+       })
+     }
+   }
+
+
+    function arrHasObjWithProp (arr, ticker) {
+      var found = "no"
+      arr.forEach((obj)=> {
+        if (obj.name === ticker) {
+          found = "yes"
+          return true
+        }
+      })
+
+      if (found === 'no') { return false }
+    }
+
+
+   $scope.updateChart = function(arr) {
+     var result = []
+     arr.forEach((stock, i)=> {
+       var ticker = stock.toUpperCase()
+
+       var url = `https://www.quandl.com/api/v3/datasets/WIKI/${ticker}.json?api_key=qAY7XBnmZQbJfSrr-tyK`
+       $http.get(url)
+       .then(function successCallback (res) {
+
+         var data = res.data.dataset.data.reverse().map((arr)=> {
+           return [new Date(arr[0]).getTime(), arr[4]]
+         })
+         var obj = {
+           name: ticker,
+           data: data,
+           color: $scope.colors[i]
+         }
+
+         console.log(arrHasObjWithProp($scope.seriesOptions, ticker))
+
+         if (arrHasObjWithProp($scope.seriesOptions, ticker) === false) {
+           $scope.seriesOptions.push(obj)
+           $scope.stockHash[ticker] = res.data.dataset.name;
+           createChart($scope.seriesOptions)
+
+      }, function (res) {
+
+      })
+
+
      })
    }
 
-    $scope.updateStocks = function (stock) {
+    $scope.updateStocks = function (stock, status) {
         var ticker = stock.toUpperCase()
         var url = `https://www.quandl.com/api/v3/datasets/WIKI/${ticker}.json?api_key=qAY7XBnmZQbJfSrr-tyK`
         $http.get(url)
@@ -38,32 +94,33 @@ angular
           var data = res.data.dataset.data.reverse().map((arr)=> {
             return [new Date(arr[0]).getTime(), arr[4]]
           })
-          $scope.seriesOptions.push({
+          var obj = {
             name: ticker,
             data: data,
             color: $scope.colors[$scope.seriesCounter]
-          })
-          $scope.seriesCounter += 1
-          $scope.stockHash[ticker] = res.data.dataset.name;
+          }
+          if (!arrHasObjWithProp($scope.seriesOptions, ticker) && status === 'loading') {
+            $scope.seriesOptions.push(obj)
+            $scope.seriesCounter += 1
+            $scope.stockHash[ticker] = res.data.dataset.name;
+          }
+
 
 
 
           if ($scope.stockList.indexOf(ticker) === -1) {
             $scope.addStockToDB(ticker)
-            $scope.stockList.push(ticker)
-            createChart($scope.seriesOptions)
-
           }
           $scope.newStock = ""
 
-          if ($scope.seriesCounter === $scope.stockList.length) {
+          if ($scope.seriesCounter === $scope.stockList.length && status === 'loading') {
             createChart($scope.seriesOptions)
 
           }
 
         }, function errorCallback (res) {
           console.log(res)
-          $scope.errorMsg = "error"
+          $scope.errorMsg = "Invalid ticker"
           $scope.newStock = ""
 
 
@@ -117,25 +174,32 @@ angular
      }
 
 
-    $scope.getStocksFromDB = function () {
+    $scope.getStocksFromDB = function (status) {
       var url = 'http://localhost:8080/api/stocks'
       $http.get(url).then(function (res) {
-        console.log(res.data)
         $scope.stockDBList = res.data
         $scope.stockList = $scope.stockDBList.map((obj)=> { return obj.ticker })
-        loadStocks()
+        if (status === 'loading') {
+          loadStocks('loading')
+        }
+
+        if (status === "socketio") {
+          $scope.updateChart($scope.stockList)
+        }
       }, function (res) {
         console.log(res)
       })
     }
 
-    $scope.getStocksFromDB()
+    $scope.getStocksFromDB("loading")
 
 
 
 
 
     function createChart(seriesOptions) {
+        console.log("creating chart now...")
+        console.log(seriesOptions)
         Highcharts.stockChart('container', {
 
             rangeSelector: {
@@ -175,6 +239,28 @@ angular
         });
     }
 
-  }])
+  }]).factory('socketio', ['$rootScope', function ($rootScope) {
+      var socket = io.connect();
+      return {
+        on: function (eventName, callback) {
+          socket.on(eventName, function () {
+            var args = arguments;
+            $rootScope.$apply(function () {
+              callback.apply(socket, args);
+            });
+          });
+        },
+        emit: function (eventName, data, callback) {
+          socket.emit(eventName, data, function () {
+            var args = arguments;
+            $rootScope.$apply(function () {
+              if (callback) {
+                callback.apply(socket, args);
+              }
+            });
+          })
+        }
+      };
+    }])
 
 }())

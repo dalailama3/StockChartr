@@ -2,7 +2,7 @@
 
 var STOCKS = require('../models/stocks.js')
 
-module.exports = function StockController () {
+module.exports = function StockController (io) {
 
   this.getStocks = function (req, res) {
     STOCKS.find({}, function (err, results) {
@@ -20,6 +20,7 @@ module.exports = function StockController () {
     newStock.save(function (err, result) {
       if (err) { throw err;}
       res.json(result)
+      io.emit('newStock', result)
     })
 
 

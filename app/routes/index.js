@@ -1,8 +1,9 @@
 'use strict';
 var StockController = require('../controllers/stockController.server.js')
-var stockController = new StockController()
 
-module.exports = function (app) {
+
+module.exports = function (app, io) {
+  var stockController = new StockController(io)
 
   app.get('/', function (req, res) {
     res.sendFile('/public/index.html')
@@ -13,6 +14,7 @@ module.exports = function (app) {
     .post(stockController.addStock)
 
   app.delete('/api/stocks/:stock', stockController.deleteStock)
+
 
 
 
