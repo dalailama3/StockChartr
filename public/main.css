@@ -6,12 +6,43 @@ body, html, ul, div, li {
   font: inherit;
 }
 
+body {
+  font-family: 'Arvo', sans-serif;
+}
+
+.jumbotron {
+  color: #071344
+}
+
+h1.title {
+  text-align: center;
+}
+
+p {
+  line-height: 1.5;
+}
+
 .stockList {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .flexDiv {
-  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   border: 1px solid black;
+  border-radius: 4px;
+  padding: 5px;
+  background: green;
+  color: white;
+}
+
+.deleteBtn {
+  margin-left: 5px;
+}
+
+#container {
+  margin: 20px;
 }

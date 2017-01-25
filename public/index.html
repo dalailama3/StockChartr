@@ -5,20 +5,27 @@
 
     <script type="text/javascript" src="https://code.highcharts.com/stock/highstock.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Arvo">
     <link rel="stylesheet" href="./main.css" type="text/css">
 
 
   </head>
   <body ng-controller="stocksController">
+    <div class="jumbotron">
+      <div class="container">
+      <h1 class="title">StockChartr</h1>
+      <p>Compare the changes in percent values of stocks against the first value in the visible date range.  Stock data is powered by the Quandl API and data is displayed with HighStocks.  Socket.io allows real-time adding and deleting of stocks.</p>
 
+      </div>
+    </div>
     <div id="container"></div>
 
 
 
     <div class="stockList">
-      <div class="flexDiv" ng-repeat="stock in stockList">{{stock}} {{stockHash[stock]}}
-          <button ng-click="deleteStock(stock)" class="deleteStock">DELETE</button>
+      <div class="flexDiv" ng-repeat="stock in stockList">
+        {{stockHash[stock]}}
+        <button ng-click="deleteStock(stock)" class="btn btn-danger deleteBtn"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
 
       </div>
 
@@ -27,7 +34,7 @@
           <div class="input-group">
             <input class="form-control" type="text" placeholder="Enter stock ticker symbol" ng-model="newStock"></input>
             <input class="form-control" type="submit"> {{errorMsg}} {{alreadyHasMsg}}
-        </div>
+          </div>
         </form>
       </div>
     </div>

@@ -54,6 +54,12 @@ angular
       if (found === 'no') { return false }
     }
 
+    function stripAwayEnd (string) {
+      var regex = /\)\sP/
+      var matchObj = string.match(regex)
+      return string.slice(0, matchObj.index + 1)
+    }
+
 
    $scope.updateChart = function(arr) {
      var result = []
@@ -77,7 +83,7 @@ angular
 
          if (arrHasObjWithProp($scope.seriesOptions, ticker) === false) {
            $scope.seriesOptions.push(obj)
-           $scope.stockHash[ticker] = res.data.dataset.name;
+           $scope.stockHash[ticker] = stripAwayEnd(res.data.dataset.name);
            createChart($scope.seriesOptions)
          }
 
@@ -108,7 +114,7 @@ angular
           if (!arrHasObjWithProp($scope.seriesOptions, ticker) && status === 'loading') {
             $scope.seriesOptions.push(obj)
             $scope.seriesCounter += 1
-            $scope.stockHash[ticker] = res.data.dataset.name;
+            $scope.stockHash[ticker] = stripAwayEnd(res.data.dataset.name);
           }
 
 
@@ -214,12 +220,13 @@ angular
         console.log(seriesOptions)
         Highcharts.stockChart('container', {
 
+
             rangeSelector: {
                 selected: 4
             },
 
             title: {
-              text: 'StockChartr'
+              text: 'Stocks'
             },
 
             yAxis: {
